@@ -1,0 +1,170 @@
+
+problem
+# Water Jug Problem using DFS (recursive approach)
+
+capacity = (12, 8, 5)
+initial_state = (12, 0, 0)
+final_state = (6, 6, 0)
+
+visited = set()
+solution_path = []
+
+def get_all_states(state):
+if state == final_state:
+solution_path.append(state)
+return True
+
+if state in visited:
+return False
+
+visited.add(state)
+a, b, c = state
+jugs = [a, b, c]
+cap = capacity
+
+# Try pouring from one jug to another
+for i in range(3): # From jug i
+for j in range(3): # To jug j
+
+if i != j and jugs[i] > 0 and jugs[j] < cap[j]:
+# Calculate how much to pour
+poured = min(jugs[i], cap[j] - jugs[j])
+next_state = list(jugs)
+next_state[i] -= poured
+next_state[j] += poured
+if get_all_states(tuple(next_state)):
+solution_path.append(state)
+return True
+return False
+
+# Run the solver
+print("Solving 3-Jug Problem...\n")
+if get_all_states(initial_state):
+solution_path.reverse()
+print("Solution Path:")
+for state in solution_path:
+print(f"Jug A: {state[0]}L, Jug B: {state[1]}L, Jug C: {state[2]}L")
+else:
+print("No solution found.")
+
+Tic-Tac-Toe
+Code –
+import tkinter as tk
+from tkinter import messagebox
+
+root = tk.Tk()
+root.title("Tic-Tac-Toe: Player vs AI")
+root.resizable(False, False)
+
+board = [""] * 9
+buttons = []
+player_symbol = "X"
+ai_symbol = "O"
+game_over = False
+
+win_conditions = [
+(0, 1, 2), (3, 4, 5), (6, 7, 8),
+(0, 3, 6), (1, 4, 7), (2, 5, 8),
+(0, 4, 8), (2, 4, 6)
+]
+
+def is_winner(brd, sym):
+return any(brd[a] == brd[b] == brd[c] == sym for a, b, c in win_conditions)
+
+def is_draw(brd):
+return "" not in brd
+
+def minimax(brd, is_ai):
+if is_winner(brd, ai_symbol): return 1
+if is_winner(brd, player_symbol): return -1
+if is_draw(brd): return 0
+
+moves, scores = [], []
+for i in range(9):
+if brd[i] == "":
+brd[i] = ai_symbol if is_ai else player_symbol
+score = minimax(brd, not is_ai)
+brd[i] = ""
+scores.append(score)
+moves.append(i)
+
+return moves[scores.index(max(scores))] if is_ai else min(scores)
+
+def get_best_move():
+best_score = -float('inf')
+move = None
+for i in range(9):
+if board[i] == "":
+board[i] = ai_symbol
+score = minimax(board, False)
+board[i] = ""
+if score > best_score:
+best_score = score
+move = i
+
+return move
+
+def check_game():
+global game_over
+if is_winner(board, player_symbol):
+status_label.config(text="You win! 🎉🎉")
+messagebox.showinfo("Game Over", "You win! 🎉🎉")
+game_over = True
+elif is_winner(board, ai_symbol):
+status_label.config(text="AI wins! �")
+messagebox.showinfo("Game Over", "AI wins! �")
+game_over = True
+elif is_draw(board):
+status_label.config(text="It's a draw! �")
+messagebox.showinfo("Game Over", "It's a draw! �")
+game_over = True
+if game_over:
+for btn in buttons:
+btn.config(state="disabled")
+
+def ai_move():
+if not game_over:
+move = get_best_move()
+if move is not None:
+board[move] = ai_symbol
+buttons[move].config(text=ai_symbol, state="disabled")
+check_game()
+
+if not game_over:
+status_label.config(text="Your Turn (X)")
+
+def on_click(i):
+if board[i] == "" and not game_over:
+board[i] = player_symbol
+buttons[i].config(text=player_symbol, state="disabled")
+check_game()
+if not game_over:
+status_label.config(text="AI is thinking...")
+root.after(300, ai_move)
+
+def reset_game():
+global board, game_over
+board = [""] * 9
+game_over = False
+for btn in buttons:
+btn.config(text="", state="normal", bg="SystemButtonFace")
+status_label.config(text="Your Turn (X)")
+
+frame = tk.Frame(root)
+frame.pack(pady=10)
+
+for i in range(9):
+btn = tk.Button(frame, text="", width=10, height=3, font=("Arial", 16),
+command=lambda i=i: on_click(i))
+btn.grid(row=i//3, column=i%3, padx=5, pady=5)
+
+buttons.append(btn)
+
+status_label = tk.Label(root, text="Your Turn (X)", font=("Arial", 14))
+status_label.pack(pady=10)
+
+tk.Button(root, text="Reset Game", font=("Arial", 12),
+command=reset_game).pack(pady=5)
+
+root.mainloop()
+
