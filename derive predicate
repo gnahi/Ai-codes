@@ -1,0 +1,47 @@
+
+Code –
+# Extended Predicate Inference in Python
+# Knowledge base: dictionary of relationships
+knowledge_base = {
+"Sachin": "Batsman",
+"Batsman": "Cricketer",
+"Cricketer": "Sportsperson",
+"Sportsperson": "Human",
+"Human": "Mammal",
+"Mammal": "LivingBeing",
+"Dog": "Mammal",
+"Cat": "Mammal"
+}
+def derive_predicate(kb, entity, target):
+"""
+Try to derive if an entity is a kind of target using transitive inference
+"""
+visited = set()
+to_visit = [entity]
+while to_visit:
+current = to_visit.pop()
+if current == target:
+return True
+if current in kb and current not in visited:
+visited.add(current)
+to_visit.append(kb[current])
+return False
+
+# Example queries
+queries = [
+("Sachin", "Cricketer"),
+("Sachin", "Sportsperson"),
+("Sachin", "LivingBeing"),
+("Dog", "LivingBeing"),
+("Cat", "Sportsperson"),
+
+]
+for entity, target in queries:
+if derive_predicate(knowledge_base, entity, target):
+print(f"{entity} is a {target}")
+else:
+print(f"Cannot derive that {entity} is a {target}")
+
+
+
+
